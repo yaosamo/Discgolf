@@ -11,6 +11,7 @@
 		5D834DD82A44E2C3003FCFF9 /* gameslist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D834DD72A44E2C3003FCFF9 /* gameslist.swift */; };
 		5D9198A62A42C5570077EB8B /* sparks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D9198A52A42C5570077EB8B /* sparks.swift */; };
 		5DA230132A40D281005E3CDF /* gameview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DA230122A40D281005E3CDF /* gameview.swift */; };
+		5DB346812A4B7DB300C6CC36 /* scoreCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DB346802A4B7DB300C6CC36 /* scoreCard.swift */; };
 		5DC337022A402F2800F56AA4 /* DiscgolfApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC337012A402F2800F56AA4 /* DiscgolfApp.swift */; };
 		5DC337042A402F2800F56AA4 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5DC337032A402F2800F56AA4 /* ContentView.swift */; };
 		5DC337062A402F2900F56AA4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5DC337052A402F2900F56AA4 /* Assets.xcassets */; };
@@ -27,6 +28,7 @@
 		5D834DD72A44E2C3003FCFF9 /* gameslist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gameslist.swift; sourceTree = "<group>"; };
 		5D9198A52A42C5570077EB8B /* sparks.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = sparks.swift; sourceTree = "<group>"; };
 		5DA230122A40D281005E3CDF /* gameview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = gameview.swift; sourceTree = "<group>"; };
+		5DB346802A4B7DB300C6CC36 /* scoreCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = scoreCard.swift; sourceTree = "<group>"; };
 		5DC336FE2A402F2800F56AA4 /* Discgolf.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Discgolf.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5DC337012A402F2800F56AA4 /* DiscgolfApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscgolfApp.swift; sourceTree = "<group>"; };
 		5DC337032A402F2800F56AA4 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -78,6 +80,7 @@
 				5D9198A52A42C5570077EB8B /* sparks.swift */,
 				5DE1D7A72A42464F001F622D /* Sparks.sks */,
 				5DA230122A40D281005E3CDF /* gameview.swift */,
+				5DB346802A4B7DB300C6CC36 /* scoreCard.swift */,
 				5DE1D7A52A42442B001F622D /* createplayer.swift */,
 				5DC337052A402F2900F56AA4 /* Assets.xcassets */,
 				5DC3370A2A402F2900F56AA4 /* Persistence.swift */,
@@ -172,6 +175,7 @@
 				5DE1D7A62A42442B001F622D /* createplayer.swift in Sources */,
 				5DC3370E2A402F2900F56AA4 /* Discgolf.xcdatamodeld in Sources */,
 				5DC3370B2A402F2900F56AA4 /* Persistence.swift in Sources */,
+				5DB346812A4B7DB300C6CC36 /* scoreCard.swift in Sources */,
 				5DA230132A40D281005E3CDF /* gameview.swift in Sources */,
 				5DC337042A402F2800F56AA4 /* ContentView.swift in Sources */,
 				5DFBBEAE2A4620B30014D358 /* colorGenerator.swift in Sources */,
