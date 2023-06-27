@@ -136,6 +136,7 @@ struct PlayerslistView: View {
         newGame.green = RGB.green
         newGame.isbglowcontrast = isDark
         newGame.players = NSSet(array: selectedPlayers)
+        newGame.id = UUID()
         
         // create game
         // create new gameDay

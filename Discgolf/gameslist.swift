@@ -51,6 +51,7 @@ struct listItem: View {
 struct GamesListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showingPlayersList = false
+    @State var selectedGame: UUID?
     var games: FetchedResults<Game>
    
     var emptyState: some View {
@@ -97,9 +98,18 @@ struct GamesListView: View {
                     if games.count > 0 {
                     ForEach(games) { game in
                             ZStack(alignment: .trailing) {
-                                NavigationLink(destination: GameView(game: game)) {
+                                NavigationLink(
+                                    destination: GameView(game: game),
+                                    tag: game.id ?? UUID(),
+                                    selection: $selectedGame
+                                ) {
                                 listItem(timestamp: game.timestamp ?? Date(), location: game.location ?? "Game \(games.count)")
                             }
+                            .onChange(of: games.count) { _ in
+                                                if let mostRecentGame = games.last {
+                                                    selectedGame = mostRecentGame.id
+                                                }
+                                            }
                             itemHoles(bgcolor: Color(red: game.red, green:game.green, blue: game.blue), isDark: game.isbglowcontrast)
                         }
                     }
