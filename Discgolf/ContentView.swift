@@ -18,13 +18,8 @@ var Surface30 = Color(red: 0xB0 / 255.0, green: 0xB9 / 255.0, blue: 0xC1 / 255.0
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
-    @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Game.timestamp, ascending: true)],
-        animation: .default)
-    private var games: FetchedResults<Game>
-    
     var body: some View {
-        GamesListView(games: games)
+        GamesListView()
     }
     
     private func addItem() {

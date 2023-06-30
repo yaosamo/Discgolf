@@ -30,7 +30,7 @@ struct PlayerslistView: View {
     var startGame: some View {
         Button("Let’s throw discs \(Image(systemName: "arrow.right"))") {
             //Create new game
-            startNewGame(playerIn: players[1])
+            startNewGame()
             dismiss()
         }
         .padding([.top, .bottom], 25)
@@ -123,7 +123,8 @@ struct PlayerslistView: View {
         }
     }
     
-    private func startNewGame(playerIn: Player) {
+    private func startNewGame() {
+        print("starting creating game")
         let hex = generateRandomHex()
         let RGB = hexToColor(hex: hex)
         let isDark = isColorTooDark(red: RGB.red, green: RGB.green, blue: RGB.blue)
@@ -135,6 +136,7 @@ struct PlayerslistView: View {
         newGame.blue = RGB.blue
         newGame.green = RGB.green
         newGame.isbglowcontrast = isDark
+        print("selected players", selectedPlayers)
         newGame.players = NSSet(array: selectedPlayers)
         newGame.id = UUID()
         

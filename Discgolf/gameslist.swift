@@ -39,21 +39,15 @@ struct listItem: View {
                 .font(Font.system(size: 20, weight: .regular))
         }
     }
-    
-    private let itemFormatter: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMMM d, ha"
-        return formatter
-    }()
-
 }
 
 struct GamesListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showingPlayersList = false
     @State var selectedGame: UUID?
-    var games: FetchedResults<Game>
-   
+    @FetchRequest(entity: Game.entity(), sortDescriptors: []) private var games: FetchedResults<Game>
+    
+    
     var emptyState: some View {
         Text("No games in the past")
             .font(Font.system(size: 20, weight: .medium))
@@ -88,7 +82,7 @@ struct GamesListView: View {
             PlayerslistView(games: games)
         }
     }
-
+    
     var body: some View {
         NavigationView {
             ZStack(alignment: .topLeading){
@@ -96,32 +90,32 @@ struct GamesListView: View {
                     Spacer()
                         .padding(.top, 350)
                     if games.count > 0 {
-                    ForEach(games) { game in
+                        ForEach(games) { game in
                             ZStack(alignment: .trailing) {
                                 NavigationLink(
                                     destination: GameView(game: game),
                                     tag: game.id ?? UUID(),
                                     selection: $selectedGame
                                 ) {
-                                listItem(timestamp: game.timestamp ?? Date(), location: game.location ?? "Game \(games.count)")
+                                    listItem(timestamp: game.timestamp ?? Date(), location: game.location ?? "Game \(games.count)")
+                                }
+                                .onChange(of: games.count) { _ in
+                                    if let mostRecentGame = games.last {
+                                        selectedGame = mostRecentGame.id
+                                    }
+                                }
+                                itemHoles(bgcolor: Color(red: game.red, green:game.green, blue: game.blue), isDark: game.isbglowcontrast)
                             }
-                            .onChange(of: games.count) { _ in
-                                                if let mostRecentGame = games.last {
-                                                    selectedGame = mostRecentGame.id
-                                                }
-                                            }
-                            itemHoles(bgcolor: Color(red: game.red, green:game.green, blue: game.blue), isDark: game.isbglowcontrast)
                         }
-                    }
-                    .onDelete(perform: deleteItems)
-                    .listRowInsets(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))
-                    .listRowSeparator(.hidden)
+                        .onDelete(perform: deleteItems)
+                        .listRowInsets(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))
+                        .listRowSeparator(.hidden)
                     } else {emptyState}
                 }
                 .listStyle(.plain)
                 gradientBehindHeader
                 header
-                .padding([.leading, .trailing],24)
+                    .padding([.leading, .trailing],24)
             }
         }
         .navigationBarHidden(true)
@@ -138,4 +132,101 @@ struct GamesListView: View {
             }
         }
     }
+}
+
+
+let itemFormatter: DateFormatter = {
+    let formatter = DateFormatter()
+    formatter.dateFormat = "MMMM d, ha"
+    return formatter
+}()
+
+
+
+
+struct ScoreCardView: View {
+    @ObservedObject var game: Game
+    @Environment(\.managedObjectContext) private var viewContext
+    
+
+    
+    var body: some View {
+        ScrollView {
+            Text(game.timestamp ?? Date(), style: .date)
+                .font(.title)
+                .padding()
+            
+            let gamePlayers = game.players?.sortedArray(using: []) as! [Player]? ?? []
+            ForEach(gamePlayers) { player in
+                
+                VStack {
+                    Text("\(player.name ?? "")")
+                        .font(.system(size: 40))
+                    
+                    
+                    if let scores = player.scores?.allObjects as? [Score] {
+//                        let sortedScores = scores.sorted { $0.hole < $1.hole }
+                        
+                        ForEach(1...6, id: \.self) { holeNumber in
+                            let scoreExist = scores.first(where: { $0.hole == holeNumber })
+                            HStack{
+                                Text("Hole: \(holeNumber) + Score:\(scoreExist?.score ?? 0)")
+                                menuContext(holeNumber: holeNumber, player: player, game: game)}
+                            
+                        }
+                    }
+                    
+                    
+                }
+            }
+        }
+        
+    }
+}
+
+
+struct menuContext: View {
+    @Environment(\.managedObjectContext) private var viewContext
+    var holeNumber: Int
+    var player: Player
+    var game: Game
+    
+    var body: some View {
+        Menu {
+            Button("Par", action: {addScore(player: player, Int16(holeNumber), score: 1)})
+            Button("Remove", action: {deleteScore(player: player, hole: Int16(holeNumber))})
+        } label: { Text("Menu")}
+    }
+    
+    private func addScore(player: Player, _ holeNumber: Int16, score: Int16) {
+        let newScore = Score(context: viewContext)
+        newScore.player = player
+        newScore.game = game
+        newScore.hole = holeNumber
+        newScore.score = score
+        
+        do {
+            try viewContext.save()
+        } catch {
+            // Handle the error
+            print("Failed to save new score: \(error)")
+        }
+    }
+    
+    private func deleteScore(player: Player, hole: Int16) {
+        if let scores = player.scores?.allObjects as? [Score] {
+            let scoreToDelete = scores.first { $0.hole == hole }
+            if let score = scoreToDelete {
+                viewContext.delete(score)
+                
+                do {
+                    try viewContext.save()
+                } catch {
+                    // Handle the error
+                    print("Failed to delete score: \(error)")
+                }
+            }
+        }
+    }
+
 }

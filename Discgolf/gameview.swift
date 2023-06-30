@@ -21,7 +21,7 @@ extension UINavigationController: UIGestureRecognizerDelegate {
 struct GameView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) private var dismiss
-
+    let sorting =  NSSortDescriptor(key: "name", ascending: true)
     var game: Game
 
     @State private var holePicked = 0
@@ -53,15 +53,15 @@ struct GameView: View {
                 VStack(alignment: .leading) {
                     Text("")
                         .padding(.bottom, 56)
-                    Text("18 June, 9pm")
+                    Text("\(game.timestamp ?? Date(), formatter: itemFormatter)")
                         .font(.system(size: 37, weight: .medium))
-                    Text("Orchard Park")
+                    Text("\(game.location ?? "Location not found")")
                         .font(.system(size: 16, weight: .medium))
                         .padding(.top, -20)
+                    
                     holesPicker
-                    var gamePlayers: [Player] {
-                        game.players?.allObjects as? [Player] ?? []
-                    }
+                    let gamePlayers = game.players?.sortedArray(using: [sorting]) as! [Player]? ?? []
+                   
                     ForEach(gamePlayers, id: \.self) { player in
                         Scorecard(player: player, game: game)
                     }
