@@ -30,11 +30,11 @@ struct listItem: View {
     var body: some View {
         VStack(alignment:.leading)
         {
-            Text("\(timestamp, formatter: itemFormatter)")
+            Text("\(location)")
                 .foregroundColor(PrimaryContent)
                 .font(Font.system(size: 20, weight: .medium))
                 .padding(.bottom, -2)
-            Text("\(location)")
+            Text("\(timestamp, formatter: itemFormatter)")
                 .foregroundColor(SecondaryContent)
                 .font(Font.system(size: 20, weight: .regular))
         }
@@ -45,7 +45,8 @@ struct GamesListView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @State private var showingPlayersList = false
     @State var selectedGame: UUID?
-    @FetchRequest(entity: Game.entity(), sortDescriptors: []) private var games: FetchedResults<Game>
+    
+    @FetchRequest(entity: Game.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Game.timestamp, ascending: true)]) private var games: FetchedResults<Game>
     
     
     var emptyState: some View {
@@ -84,12 +85,13 @@ struct GamesListView: View {
     }
     
     var body: some View {
+        let GamesTotalCount = games.count
         NavigationView {
             ZStack(alignment: .topLeading){
                 List {
                     Spacer()
                         .padding(.top, 350)
-                    if games.count > 0 {
+                    if GamesTotalCount > 0 {
                         ForEach(games) { game in
                             ZStack(alignment: .trailing) {
                                 NavigationLink(
@@ -97,11 +99,13 @@ struct GamesListView: View {
                                     tag: game.id ?? UUID(),
                                     selection: $selectedGame
                                 ) {
-                                    listItem(timestamp: game.timestamp ?? Date(), location: game.location ?? "Game \(games.count)")
+                                    listItem(timestamp: game.timestamp ?? Date(), location: game.location ?? "Game")
                                 }
-                                .onChange(of: games.count) { _ in
-                                    if let mostRecentGame = games.last {
-                                        selectedGame = mostRecentGame.id
+                                .onChange(of: games.count) { new in
+                                    if GamesTotalCount <= new {
+                                        if let mostRecentGame = games.last {
+                                            selectedGame = mostRecentGame.id
+                                        }
                                     }
                                 }
                                 itemHoles(bgcolor: Color(red: game.red, green:game.green, blue: game.blue), isDark: game.isbglowcontrast)
@@ -137,96 +141,6 @@ struct GamesListView: View {
 
 let itemFormatter: DateFormatter = {
     let formatter = DateFormatter()
-    formatter.dateFormat = "MMMM d, ha"
+    formatter.dateFormat = "MMMM d, HH:mm a"
     return formatter
 }()
-
-
-
-
-struct ScoreCardView: View {
-    @ObservedObject var game: Game
-    @Environment(\.managedObjectContext) private var viewContext
-    
-
-    
-    var body: some View {
-        ScrollView {
-            Text(game.timestamp ?? Date(), style: .date)
-                .font(.title)
-                .padding()
-            
-            let gamePlayers = game.players?.sortedArray(using: []) as! [Player]? ?? []
-            ForEach(gamePlayers) { player in
-                
-                VStack {
-                    Text("\(player.name ?? "")")
-                        .font(.system(size: 40))
-                    
-                    
-                    if let scores = player.scores?.allObjects as? [Score] {
-//                        let sortedScores = scores.sorted { $0.hole < $1.hole }
-                        
-                        ForEach(1...6, id: \.self) { holeNumber in
-                            let scoreExist = scores.first(where: { $0.hole == holeNumber })
-                            HStack{
-                                Text("Hole: \(holeNumber) + Score:\(scoreExist?.score ?? 0)")
-                                menuContext(holeNumber: holeNumber, player: player, game: game)}
-                            
-                        }
-                    }
-                    
-                    
-                }
-            }
-        }
-        
-    }
-}
-
-
-struct menuContext: View {
-    @Environment(\.managedObjectContext) private var viewContext
-    var holeNumber: Int
-    var player: Player
-    var game: Game
-    
-    var body: some View {
-        Menu {
-            Button("Par", action: {addScore(player: player, Int16(holeNumber), score: 1)})
-            Button("Remove", action: {deleteScore(player: player, hole: Int16(holeNumber))})
-        } label: { Text("Menu")}
-    }
-    
-    private func addScore(player: Player, _ holeNumber: Int16, score: Int16) {
-        let newScore = Score(context: viewContext)
-        newScore.player = player
-        newScore.game = game
-        newScore.hole = holeNumber
-        newScore.score = score
-        
-        do {
-            try viewContext.save()
-        } catch {
-            // Handle the error
-            print("Failed to save new score: \(error)")
-        }
-    }
-    
-    private func deleteScore(player: Player, hole: Int16) {
-        if let scores = player.scores?.allObjects as? [Score] {
-            let scoreToDelete = scores.first { $0.hole == hole }
-            if let score = scoreToDelete {
-                viewContext.delete(score)
-                
-                do {
-                    try viewContext.save()
-                } catch {
-                    // Handle the error
-                    print("Failed to delete score: \(error)")
-                }
-            }
-        }
-    }
-
-}

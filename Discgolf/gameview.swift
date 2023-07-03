@@ -53,9 +53,9 @@ struct GameView: View {
                 VStack(alignment: .leading) {
                     Text("")
                         .padding(.bottom, 56)
-                    Text("\(game.timestamp ?? Date(), formatter: itemFormatter)")
+                    Text("\(game.location ?? "Game")")
                         .font(.system(size: 37, weight: .medium))
-                    Text("\(game.location ?? "Location not found")")
+                    Text("\(game.timestamp ?? Date(), formatter: itemFormatter)")
                         .font(.system(size: 16, weight: .medium))
                         .padding(.top, -20)
                     

@@ -39,6 +39,6 @@ func isColorTooDark(red: Double, green: Double, blue: Double) -> Bool {
     // Calculate relative luminance using WCAG formula
     let relativeLuminance = (0.2126 * red) + (0.7152 * green) + (0.0722 * blue)
     // Compare relative luminance to a threshold value
-    let luminanceThreshold: CGFloat = 0.4
+    let luminanceThreshold: CGFloat = 0.7
     return relativeLuminance <= luminanceThreshold
 }
