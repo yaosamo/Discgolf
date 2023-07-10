@@ -9,18 +9,18 @@ import SwiftUI
 import CoreData
 
 
-class GameMaster: ObservableObject {
-    @Published var whosInfortheGame = NSSet()
-}
 
 struct PlayerslistView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
-    @StateObject var gameMaster = GameMaster()
-    @State private var showingPlayerList = false
     @State private var showingCreatePlayer = false
     @State private var selectedPlayers: [Player] = []
     
+    @State private var playerExist = false
+    @State private var selectedPlayer: Player?
+    @State private var playername = ""
+
+
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Player.name, ascending: true)],
         animation: .default)
@@ -49,10 +49,8 @@ struct PlayerslistView: View {
         .frame(maxWidth: .infinity, alignment: .center)
         .foregroundColor(.black)
         .font(Font.system(size: 32, weight: .medium))
-        .popover(isPresented: $showingCreatePlayer) {
-            CreatePlayerView()
-        }
     }
+    
     
     var playerslistHeader: some View {
         HStack {
@@ -82,13 +80,21 @@ struct PlayerslistView: View {
             .foregroundColor(SecondaryContent)
     }
     
+    var howToDelete: some View {
+        Text("To delete player swipe right to left")
+            .font(.system(size: 20, weight: .regular))
+            .listRowInsets(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))
+            .listRowSeparator(.hidden)
+            .foregroundColor(SecondaryContent)
+    }
+    
     var body: some View {
         ZStack(alignment: .bottom){
             List {
                 playerslistHeader
                 if players.count > 0 {
                     ForEach(players, id:\.self) { player in
-                        HStack{
+                        HStack {
                             Text("\(player.name ?? "")")
                             Spacer()
                             let playerIn = selectedPlayers.contains(player)
@@ -112,8 +118,13 @@ struct PlayerslistView: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: 32, bottom: 0, trailing: 32))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
+                    if players.count == 1 {howToDelete}
                 } else {emptyState}
                 addNewPlayer
+                    .popover(isPresented: $showingCreatePlayer) {
+                        CreatePlayerView()
+                    }
+
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -124,7 +135,6 @@ struct PlayerslistView: View {
     }
     
     private func startNewGame() {
-        print("starting creating game")
         let hex = generateRandomHex()
         let RGB = hexToColor(hex: hex)
         let isDark = isColorTooDark(red: RGB.red, green: RGB.green, blue: RGB.blue)
@@ -160,6 +170,16 @@ struct PlayerslistView: View {
             } catch {
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
+            }
+        }
+    }
+    
+    private func updatePlayer(player: Player) {
+        withAnimation {
+            viewContext.performAndWait {
+                player.name = playername
+                try? viewContext.save()
+                print("player name updated")
             }
         }
     }

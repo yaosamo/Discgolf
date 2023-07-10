@@ -11,14 +11,14 @@ import CoreData
 struct CreatePlayerView: View {
     @Environment(\.managedObjectContext) private var viewContext
     @Environment(\.dismiss) var dismiss
-    @State private var playername = "Player 1"
+    @State var playername = "Player"
     
     var AddPlayerButton: some View {
         Button(action: {
-            addPlayer()
+                addPlayer()
             dismiss()
         }) {
-            Text("Create")
+            Text("Done")
                 .padding([.top, .bottom], 25)
                 .frame(maxWidth: .infinity)
                 .font(Font.system(size: 32, weight: .medium))
@@ -30,6 +30,7 @@ struct CreatePlayerView: View {
     }
     
     var createPlayerHeader: some View {
+
         HStack {
             Text("Name")
             Spacer()
@@ -53,7 +54,7 @@ struct CreatePlayerView: View {
         VStack(alignment: .leading) {
             createPlayerHeader
                 .padding([.top], 24)
-            TextField("Player name", text: $playername)
+            TextField("Name", text: $playername)
                 .font(.system(size: 80, weight: .semibold))
                 .multilineTextAlignment(.leading)
                 .padding(.top, -16)
@@ -72,4 +73,15 @@ struct CreatePlayerView: View {
             print("new player created")
         }
     }
+    
+    private func updatePlayer(player: Player) {
+        withAnimation {
+            viewContext.performAndWait {
+                player.name = playername
+                try? viewContext.save()
+                print("player name updated")
+            }
+        }
+    }
+
 }

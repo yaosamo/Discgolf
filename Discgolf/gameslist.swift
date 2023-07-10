@@ -8,6 +8,7 @@
 import SwiftUI
 import CoreData
 
+
 struct itemHoles: View {
     var bgcolor : Color
     var isDark : Bool
@@ -48,9 +49,53 @@ struct GamesListView: View {
     
     @FetchRequest(entity: Game.entity(), sortDescriptors: [NSSortDescriptor(keyPath: \Game.timestamp, ascending: true)]) private var games: FetchedResults<Game>
     
+    var flyingDisc: some View {
+        ZStack {
+            Ellipse()
+                .background(.ultraThinMaterial.opacity(0.9))
+                .frame(width: 300, height: 120)
+                .clipShape(Ellipse())
+                .rotationEffect(Angle(degrees: 52.95))
+                .offset(x: 30, y: 80)
+                .foregroundColor(.clear)
+            Ellipse()
+                .frame(width: 300, height: 120)
+                .background(
+                    EllipticalGradient(
+                        stops: [
+                            Gradient.Stop(color: Color(red: 0.98, green: 0.24, blue: 0), location: 0.00),
+                            Gradient.Stop(color: Color(red: 0.98, green: 0.24, blue: 0).opacity(0.4), location: 0.92),
+                            Gradient.Stop(color: Color(red: 0.98, green: 0.24, blue: 0), location: 0.96),
+                            Gradient.Stop(color: Color(red: 0.98, green: 0.24, blue: 0), location: 1.0),
+                        ],
+                        center: UnitPoint(x: 0.5, y: 0.46)
+                    )
+                )
+                .clipShape(Ellipse())
+                .rotationEffect(Angle(degrees: 52.95))
+                .foregroundColor(.clear)
+                .offset(x: 30, y: 80)
+            Ellipse()
+                .stroke(Color.white.opacity(0.2), lineWidth: 6)
+                .foregroundColor(.clear)
+                .frame(width: 140, height: 48)
+                .clipShape(Ellipse())
+                .rotationEffect(Angle(degrees: 52.95))
+                .offset(x: 36, y: 74)
+
+        }
+    }
     
     var emptyState: some View {
         Text("No games in the past")
+            .font(Font.system(size: 20, weight: .medium))
+            .listRowInsets(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))
+            .listRowSeparator(.hidden)
+            .foregroundColor(SecondaryContent)
+    }
+    
+    var howToDeleteHint: some View {
+        Text("To delete game swipe right to left")
             .font(Font.system(size: 20, weight: .medium))
             .listRowInsets(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))
             .listRowSeparator(.hidden)
@@ -71,13 +116,16 @@ struct GamesListView: View {
         Button(action: {
             showingPlayersList.toggle()
         }, label: {
-            VStack(alignment: .leading, spacing: -40) {
-                Text("Start ")
-                Text("new\(Image(systemName: "arrow.right")) ")
-                Text("game ")
+            ZStack {
+                VStack(alignment: .leading, spacing: -40) {
+                    Text("Start ")
+                    Text("new\(Image(systemName: "arrow.right")) ")
+                    Text("game ")
+                }
+                .font(Font.system(size: 112, weight: .semibold))
+                .foregroundColor(.black)
+                flyingDisc
             }
-            .font(Font.system(size: 112, weight: .semibold))
-            .foregroundColor(.black)
         })
         .popover(isPresented: $showingPlayersList) {
             PlayerslistView(games: games)
@@ -110,6 +158,8 @@ struct GamesListView: View {
                                 }
                                 itemHoles(bgcolor: Color(red: game.red, green:game.green, blue: game.blue), isDark: game.isbglowcontrast)
                             }
+                            if GamesTotalCount == 1 {howToDeleteHint}
+
                         }
                         .onDelete(perform: deleteItems)
                         .listRowInsets(EdgeInsets(top: 16, leading: 32, bottom: 16, trailing: 32))

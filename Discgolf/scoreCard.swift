@@ -70,7 +70,8 @@ struct Holes: View {
                     case 6: eagle
                     case 7: ace
                     default: emptyHole
-                    } } else { emptyHole}
+                    }
+                } else { emptyHole }
             }
         }
     }
@@ -98,7 +99,6 @@ struct Holes: View {
                 try? viewContext.save()
             }
         }
-        
         
         private func deleteScore(player: Player, hole: Int16) {
             if let scores = player.scores?.allObjects as? [Score] {
