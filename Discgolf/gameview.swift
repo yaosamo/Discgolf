@@ -27,7 +27,7 @@ struct GameView: View {
     @State private var holePicked = 0
     
     var holesPicker: some View {
-        // makec check
+        // makec chec
         Picker("Choose round", selection: $holePicked) {
             Text("Front 9").tag(0)
             Text("Back 9").tag(1)

@@ -14,19 +14,26 @@ var birdieElement = Color(red: 0x54 / 255.0, green: 0x66 / 255.0, blue: 0x0C / 2
 var eagleElement = Color(red: 0x12 / 255.0, green: 0x6D / 255.0, blue: 0x3C / 255.0)
 var aceElement = Color(red: 0x1E / 255.0, green: 0x40 / 255.0, blue: 0x67 / 255.0)
 
-
 struct Scorecard: View {
     @Environment(\.managedObjectContext) private var viewContext
     var player: Player
     var game: Game
-    
+    @State var score = 0
     var body: some View {
+        // move this up?
+        if let scores = player.scores?.allObjects as? [Score] {
+                   let scoreObjectExist = scores.first(where: { $0.game == game })
+                if scoreObjectExist != nil {
+                       let totalScore = scores.reduce(0, { $0 + $1.score })
+                }
+            }
+        
         VStack {
             HStack {
                 Text("\(player.name ?? "")")
                     .font(.system(size: 37, weight: .medium))
                 Spacer()
-                Text("E") // calculate value!
+                Text("\(score)")
                     .font(.system(size: 37, weight: .medium))
             }
             .padding(.bottom, 10)
@@ -38,13 +45,33 @@ struct Scorecard: View {
                             .foregroundColor(SecondaryContent)
                             .font(.system(size: 12, weight: .bold))
                     }
+                    
                 }
             }
             
         }
         .padding(.bottom, 16)
     }
+    
+    private func holeGotScore(holeNumber: Int) -> Int {
+        var score = 0
+        if let scores = player.scores?.allObjects as? [Score] {
+            let scoreObjectExist = scores.first(where: { $0.hole == holeNumber && $0.game == game })
+            if scoreObjectExist != nil {
+                score = Int(scoreObjectExist?.score ?? 0)
+                return score
+            }
+        }
+        return score
+    }
+    
+    private func something(holeNumber: Int) -> Int {
+        var totalpoints = score
+        return totalpoints
+    }
 }
+
+
 
 
 struct Holes: View {
