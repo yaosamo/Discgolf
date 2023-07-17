@@ -59,12 +59,15 @@ struct GameView: View {
                     Text("\(game.timestamp ?? Date(), formatter: itemFormatter)")
                         .font(.system(size: 16, weight: .medium))
                         .padding(.top, -20)
-                    
+                    // content switcher
                     holesPicker
+                    // game players object
                     let gamePlayers = game.players?.sortedArray(using: [sorting]) as! [Player]? ?? []
                    
                     ForEach(gamePlayers, id: \.self) { player in
-                        Scorecard(player: player, game: game)
+                        let scores = player.scores?.allObjects as? [Score]
+                        Scorecard(player: player, game: game, scores: scores!)
+                        
                     }
                 }
                 .padding([.leading, .trailing], 24)

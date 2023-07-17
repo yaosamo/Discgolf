@@ -18,23 +18,22 @@ struct Scorecard: View {
     @Environment(\.managedObjectContext) private var viewContext
     var player: Player
     var game: Game
+    var scores: [Score]
     @State var score = 0
+    
     var body: some View {
-        // move this up?
-        if let scores = player.scores?.allObjects as? [Score] {
-                   let scoreObjectExist = scores.first(where: { $0.game == game })
-                if scoreObjectExist != nil {
-                       let totalScore = scores.reduce(0, { $0 + $1.score })
-                }
-            }
-        
         VStack {
             HStack {
                 Text("\(player.name ?? "")")
                     .font(.system(size: 37, weight: .medium))
                 Spacer()
-                Text("\(score)")
-                    .font(.system(size: 37, weight: .medium))
+                
+                    // total score sum, need to apply appropriate -1 count
+                    let totalScore = scores.reduce(0, { $0 + $1.score })
+                
+                    Text("\(totalScore)")
+                        .font(.system(size: 37, weight: .medium))
+                
             }
             .padding(.bottom, 10)
             HStack {
@@ -51,23 +50,6 @@ struct Scorecard: View {
             
         }
         .padding(.bottom, 16)
-    }
-    
-    private func holeGotScore(holeNumber: Int) -> Int {
-        var score = 0
-        if let scores = player.scores?.allObjects as? [Score] {
-            let scoreObjectExist = scores.first(where: { $0.hole == holeNumber && $0.game == game })
-            if scoreObjectExist != nil {
-                score = Int(scoreObjectExist?.score ?? 0)
-                return score
-            }
-        }
-        return score
-    }
-    
-    private func something(holeNumber: Int) -> Int {
-        var totalpoints = score
-        return totalpoints
     }
 }
 
